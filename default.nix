@@ -9,5 +9,7 @@ rec {
     inherit home-manager;
   };
 
+  docs = import ./doc { inherit pkgs; };
+
   nixos = import ./nixos;
 }
