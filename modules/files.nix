@@ -19,7 +19,7 @@ let
       sourcePath = toString file.source;
       sourceName = config.lib.strings.storeFileName (baseNameOf sourcePath);
     in
-      if builtins.hasContext sourcePath
+      if (builtins.isString file.source) || (builtins.hasContext sourcePath)
       then file.source
       else builtins.path { path = file.source; name = sourceName; };
 
