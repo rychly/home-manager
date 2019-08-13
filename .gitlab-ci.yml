@@ -1,15 +1,15 @@
 image: nixos/nix:latest
 
 stages:
-  - test
+  # - test
   - deploy
 
-Run tests:
-  stage: test
-  script:
-    - nix-shell tests -A run.all
-  only:
-    - master
+# Run tests:
+#   stage: test
+#   script:
+#     - nix-shell tests -A run.all
+#   only:
+#     - master
 
 Deploy manual:
   stage: deploy
@@ -24,3 +24,14 @@ Deploy manual:
       - public
   only:
     - master
+
+Deploy NUR:
+  stage: deploy
+  variables:
+    HM_BRANCH: $CI_COMMIT_REF_NAME
+    HM_COMMIT_SHA: $CI_COMMIT_SHA
+  trigger:
+    project: rycee/nur-expressions
+    branch: home-manager
+  only:
+    - nur-pkgs
