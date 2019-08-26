@@ -7,8 +7,8 @@ let
   nmdSrc = pkgs.fetchFromGitLab {
     owner = "rycee";
     repo = "nmd";
-    rev = "b57fc6657b6645086a286e62a05a1795f258daa6";
-    sha256 = "1b6bdgn6d4awxi8al5hbw8vycxp4laf63l29rjrvxi2j2g69rgvc";
+    rev = "ddfb3861fd8aa7c59fc68e912f178270b13a672e";
+    sha256 = "02p136j10hj8q5qyp2y83qryk8zql7kwxcf23wzdlcskfv1b4ih2";
   };
 
   nmd = import nmdSrc { inherit pkgs; };
