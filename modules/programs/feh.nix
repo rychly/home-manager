@@ -9,16 +9,17 @@ let
   disableBinding = func: key: func;
   enableBinding = func: key: "${func} ${key}";
 
-in
-
-{
+in {
   options.programs.feh = {
     enable = mkEnableOption "feh - a fast and light image viewer";
 
     keybindings = mkOption {
-      default = {};
+      default = { };
       type = types.attrsOf types.str;
-      example = { zoom_in = "plus"; zoom_out = "minus"; };
+      example = {
+        zoom_in = "plus";
+        zoom_out = "minus";
+      };
       description = ''
         Set keybindings.
         See <link xlink:href="https://man.finalrewind.org/1/feh/#x4b455953"/> for

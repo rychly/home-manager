@@ -7,7 +7,7 @@ let
   cfg = config.programs.irssi;
 
   boolStr = b: if b then "yes" else "no";
-  quoteStr = s: escape ["\""] s;
+  quoteStr = s: escape [ ''"'' ] s;
 
   assignFormat = set:
     concatStringsSep "\n"
@@ -69,7 +69,7 @@ let
     };
   };
 
-  networkType = types.submodule ({ name, ...}: {
+  networkType = types.submodule ({ name, ... }: {
     options = {
       name = mkOption {
         visible = false;
@@ -90,7 +90,7 @@ let
 
       autoCommands = mkOption {
         type = types.listOf types.str;
-        default = [];
+        default = [ ];
         description = "List of commands to execute on connect.";
       };
 
@@ -130,14 +130,12 @@ let
       channels = mkOption {
         description = "Channels for the given network.";
         type = types.attrsOf channelType;
-        default = {};
+        default = { };
       };
     };
   });
 
-in
-
-{
+in {
 
   options = {
     programs.irssi = {
@@ -150,14 +148,17 @@ in
       };
 
       aliases = mkOption {
-        default = {};
-        example = { J = "join"; BYE = "quit";};
+        default = { };
+        example = {
+          J = "join";
+          BYE = "quit";
+        };
         description = "An attribute set that maps aliases to commands.";
         type = types.attrsOf types.str;
       };
 
       networks = mkOption {
-        default = {};
+        default = { };
         example = literalExample ''
           {
             freenode = {
