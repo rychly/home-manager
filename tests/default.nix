@@ -49,6 +49,7 @@ import nmt {
     ./modules/programs/firefox
     ./modules/programs/getmail
     ./modules/programs/rofi
+    ./modules/services/polybar
     ./modules/services/sxhkd
     ./modules/services/window-managers/i3
     ./modules/systemd
