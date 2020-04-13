@@ -56,7 +56,7 @@ let
     };
   };
 
-  matchBlockModule = types.submodule ({ name, ... }: {
+  matchBlockModule = types.submodule ({ dagName, ... }: {
     options = {
       host = mkOption {
         type = types.str;
@@ -266,7 +266,7 @@ let
       };
     };
 
-    config.host = mkDefault name;
+    config.host = mkDefault dagName;
   });
 
   matchBlockStr = cf: concatStringsSep "\n" (
@@ -392,7 +392,7 @@ in
     };
 
     matchBlocks = mkOption {
-      type = types.loaOf matchBlockModule;
+      type = hm.types.listOrDagOf matchBlockModule;
       default = {};
       example = literalExample ''
         {
@@ -432,18 +432,24 @@ in
             checkLocal = block: any' checkBindAndHost block.localForwards;
             checkRemote = block: any' checkBindAndHost block.remoteForwards;
             checkMatchBlock = block: all (fn: fn block) [ checkLocal checkRemote checkDynamic ];
-          in any' checkMatchBlock (builtins.attrValues cfg.matchBlocks);
+          in any' checkMatchBlock (map (block: block.data) (builtins.attrValues cfg.matchBlocks));
         message = "Forwarded paths cannot have ports.";
       }
     ];
 
-    home.file.".ssh/config".text = ''
+    home.file.".ssh/config".text =
+      let
+        sortedMatchBlocks = hm.dag.topoSort cfg.matchBlocks;
+        sortedMatchBlocksStr = builtins.toJSON sortedMatchBlocks;
+        matchBlocks =
+          if sortedMatchBlocks ? result
+          then sortedMatchBlocks.result
+          else abort "Dependency cycle in SSH match blocks: ${sortedMatchBlocksStr}";
+      in ''
       ${concatStringsSep "\n" (
         mapAttrsToList (n: v: "${n} ${v}") cfg.extraOptionOverrides)}
 
-      ${concatStringsSep "\n\n" (
-        map matchBlockStr (
-        builtins.attrValues cfg.matchBlocks))}
+      ${concatStringsSep "\n\n" (map (block: matchBlockStr block.data) matchBlocks)}
 
       Host *
         ForwardAgent ${yn cfg.forwardAgent}
