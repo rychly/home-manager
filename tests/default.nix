@@ -31,6 +31,7 @@ import nmt {
   testedAttrPath = [ "home" "activationPackage" ];
   tests = builtins.foldl' (a: b: a // (import b)) { } ([
     ./lib/types
+    ./meta
     ./modules/files
     ./modules/home-environment
     ./modules/misc/fontconfig
