@@ -5,5 +5,7 @@ os:
   - osx
 
 script:
+  # Override the minver.
+  - export NIX_PATH=nixpkgs=$(nix-build --no-out-link -E '(import <nixpkgs/pkgs/top-level/impure.nix> {}).runCommandLocal "tweaked-nixpkgs" {} "cp -dR ${<nixpkgs>} $out; chmod 644 $out/lib/minver.nix; echo \'"2.0"\' > $out/lib/minver.nix"'):$NIX_PATH
   - nix-shell . -A install
   - nix-shell --pure --max-jobs 10 tests -A run.all
