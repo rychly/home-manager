@@ -49,14 +49,22 @@ let
     merge = lib.mergeOneOption;
   };
 
-  _pkgs = import <nixpkgs> (
-    filterAttrs (n: v: v != null) config.nixpkgs
+  _pkgs = import config.nixpkgs.path (
+    filterAttrs (n: v: v != null && n != "path") config.nixpkgs
   );
 
 in
 
 {
   options.nixpkgs = {
+    path = mkOption {
+      default = <nixpkgs>;
+      defaultText = literalExample "<nixpkgs>";
+      type = types.path;
+      visible = false;
+      description = "Absolute path to Nixpkgs.";
+    };
+
     config = mkOption {
       default = null;
       example = { allowBroken = true; };
