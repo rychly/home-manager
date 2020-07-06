@@ -99,6 +99,11 @@ let
       ) + "\n";
     };
 
+  sd-switch =
+    let
+      url = "https://gitlab.com/rycee/sd-switch/-/archive/master/sd-switch-master.tar.bz2";
+    in import (builtins.fetchTarball url) { inherit pkgs; };
+
 in
 
 {
@@ -155,6 +160,7 @@ in
       startServices = mkOption {
         default = false;
         type = types.bool;
+        visible = false;
         description = ''
           Start all services that are wanted by active targets.
           Additionally, stop obsolete services from the previous
@@ -203,6 +209,10 @@ in
               "Must use Linux for modules that require systemd: " + names;
         }
       ];
+
+      warnings = mkIf cfg.startServices [
+        "The option systemd.user.startServices is obsolete and can be removed."
+      ];
     }
 
     # If we run under a Linux system we assume that systemd is
@@ -230,13 +240,11 @@ in
       # set it ourselves in that case.
       home.activation.reloadSystemD = hm.dag.entryAfter ["linkGeneration"] (
         let
-          autoReloadCmd = ''
-            ${pkgs.ruby}/bin/ruby ${./systemd-activate.rb} \
-              "''${oldGenPath=}" "$newGenPath" "${servicesStartTimeoutMs}"
-          '';
-
-          legacyReloadCmd = ''
-            bash ${./systemd-activate.sh} "''${oldGenPath=}" "$newGenPath"
+          sdSwitchCmd = ''
+            ${sd-switch}/bin/sd-switch \
+              ''${DRY_RUN:+--dry-run} $VERBOSE_ARG \
+              ''${oldGenPath:+--old-units $oldGenPath/home-files/.config/systemd/user} \
+              --new-units $newGenPath/home-files/.config/systemd/user
           '';
 
           ensureRuntimeDir = "XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/$(id -u)}";
@@ -254,8 +262,7 @@ in
               fi
 
               ${ensureRuntimeDir} \
-              PATH=${dirOf cfg.systemctlPath}:$PATH \
-                ${if cfg.startServices then autoReloadCmd else legacyReloadCmd}
+                ${sdSwitchCmd}
             else
               echo "User systemd daemon not running. Skipping reload."
             fi
