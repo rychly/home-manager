@@ -11,9 +11,9 @@ stages:
 Run tests:
   stage: test
   script:
-    - nix-shell --pure tests -A run.files-text
+    - nix-shell --pure tests -A run.all
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "rah/test"
       when: always
 
 pages:
